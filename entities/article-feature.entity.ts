@@ -28,8 +28,8 @@ export class ArticleFeature {
   @Column({ type: "int", name: "feature_id", unsigned: true })
   featureId: number;
 
-  @Column({ type: "varchar", length: 255 })
-  value: string;
+  @Column({ type: "varchar", name: "Column 4", length: 255})
+  column_4: string;
 
   @ManyToOne(() => Article, (article) => article.articleFeatures, {
     onDelete: "NO ACTION",
