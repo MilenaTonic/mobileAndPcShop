@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { Crud } from "@nestjsx/crud";
 import { Article } from "src/entities/article.entity";
 import { AddArticleDto } from "src/dtos/article/add.article.dto";
@@ -168,5 +168,43 @@ export class ArticleController {
             height: resizeSettings.height,
         })
         .toFile(destinationFilePath);
+    }
+
+    @Delete(':articleId/deletePhoto/:photoId') // http:/localhost:3000/api/article/1/deletePhoto/3
+    public async deletePhoto(
+        @Param('articleId') articleId: number,
+        @Param('photoId') photoId: number,
+    ) {
+        const photo = await this.photoService.findOne({
+            articleId: articleId,
+            photoId: photoId
+        });
+
+        if(!photo) {
+            return new ApiResponse('error', -4004, 'Photo not found!');
+        }
+
+        try {
+            // Brisanje svih 3 slika
+            fs.unlinkSync(StorageConfig.photo.destination + photo.imagePath);
+            fs.unlinkSync(StorageConfig.photo.destination + 
+                StorageConfig.photo.resize.thumb.directory + 
+                photo.imagePath);
+            fs.unlinkSync(StorageConfig.photo.destination + 
+                StorageConfig.photo.resize.small.directory + 
+                photo.imagePath);
+        } catch (e) {
+            // OVDE NE MORA NISTA DA SE STAVI ZATO JE I PRAZNO
+        }
+
+        // Brisanje slike iz baze podataka
+        const deleteResult = await this.photoService.deleteById(photoId);
+
+        // affected - Koliko je zapisa iz baze obrisano
+        if(deleteResult.affected === 0) {
+            return new ApiResponse('error', -4004, 'Photo not found!');
+        }
+
+        return new ApiResponse('ok', 0, 'One photo deleted!');
     }
 }
