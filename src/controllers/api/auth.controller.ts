@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Req } from "@nestjs/common";
-import { Administrator } from "entities/administrator.entity";
+import { Administrator } from "src/entities/administrator.entity";
 import { LoginAdministratorDto } from "src/dtos/administrator/login.administrator.dto";
 import { ApiResponse } from "src/misc/api.response.class";
 import { AdministratorService } from "src/services/administrator/administrator.service";
@@ -49,7 +49,7 @@ export class AuthController {
         let sada = new Date();
         sada.setDate(sada.getDate() + 14); // 14 dana traje nas 'sada'
         const istekTimestamp = sada.getTime() / 1000;
-        jwtData.ext = istekTimestamp;
+        jwtData.exp = istekTimestamp;
 
         jwtData.ip = req.ip.toString();
         jwtData.ua = req.headers["user-agent"];
