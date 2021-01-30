@@ -6,11 +6,15 @@ import { CartService } from "src/services/cart/cart.service";
 import { Request } from "express";
 import { AddArticleToCartDto } from "src/dtos/cart/add.article.to.cart.dto";
 import { EditArticleInCartDto } from "src/dtos/cart/edit.article.in.cart.dto";
+import { ApiResponse } from "src/misc/api.response.class";
+import { Order } from "src/entities/order.entity";
+import { OrderService } from "src/services/order/order.service";
 
 @Controller('api/user/cart')
 export class UserCartController {
     constructor(
-        private cartService: CartService
+        private cartService: CartService,
+        private orderService: OrderService,
     ) { }
 
     private async getActiveCartForUserId(userId: number): Promise<Cart> {
@@ -47,5 +51,14 @@ export class UserCartController {
     async changeQuantity(@Body() data: EditArticleInCartDto, @Req() req: Request): Promise<Cart> {
         const cart = await this.getActiveCartForUserId(req.token.id);
         return await this.cartService.changeQuantity(cart.cartId, data.articleId, data.quantity);
+    }
+
+    // POST http://localhost:3000/api/user/cart/makeOrder/
+    @Post('makeOrder')
+    @UseGuards(RoleCheckedGuard)
+    @AllowToRoles('user')
+    async makeOrder(@Req() req: Request): Promise<Order | ApiResponse> {
+        const cart = await this.getActiveCartForUserId(req.token.id);
+        return await this.orderService.add(cart.cartId);
     }
 }
