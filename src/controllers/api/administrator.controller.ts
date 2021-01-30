@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from "@nestjs/common";
 import { Administrator } from "src/entities/administrator.entity";
 import { AddAdministratorDto } from "src/dtos/administrator/add.administrator.dto";
 import { EditAdministratorDto } from "src/dtos/administrator/edit.administrator.dto";
@@ -36,19 +36,19 @@ export class AdministratorController {
     }
 
     // Dodavanje novog administratora
-    // PUT Metod => koristimo kada radimo dodavanje novog zapisa
-    // PUT: http://localhost:3000/api/administrator/
-    @Put()
+    // POST Metod => koristimo kada radimo dodavanje novog zapisa
+    // POST: http://localhost:3000/api/administrator/
+    @Post()
     @UseGuards(RoleCheckedGuard)
     @AllowToRoles('administrator')
     add(@Body() data: AddAdministratorDto): Promise<Administrator | ApiResponse> {
         return this.administratorService.add(data);
     }
 
-    // POST Metoda sluzi za editovanje
-    // PUT: http://localhost:3000/api/administrator/1/
-    // POST Metodom se salje telo sa sadrzajem novog admina njih dobijamo kroz @Body
-    @Post(':id')
+    // Patch Metoda sluzi za editovanje
+    // Patch: http://localhost:3000/api/administrator/1/
+    // Patch Metodom se salje telo sa sadrzajem novog admina njih dobijamo kroz @Body
+    @Patch(':id')
     @UseGuards(RoleCheckedGuard)
     @AllowToRoles('administrator')
     edit(@Param('id') id: number, @Body() data: EditAdministratorDto): Promise<Administrator | ApiResponse> {
