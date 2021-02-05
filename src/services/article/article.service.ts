@@ -121,7 +121,7 @@ export class ArticleService extends TypeOrmCrudService<Article> {
         });
     }
 
-    async search(data: ArticleSearchDto): Promise<Article[]> {
+    async search(data: ArticleSearchDto): Promise<Article[] | ApiResponse> {
         // Query builder
         const builder = await this.article.createQueryBuilder("article");
 
@@ -204,6 +204,10 @@ export class ArticleService extends TypeOrmCrudService<Article> {
         builder.take(perPage);
 
         let articleIds = await (await builder.getMany()).map(article => article.articleId);
+
+        if(articleIds.length === 0) {
+            return new ApiResponse("ok", 0, "No articles found for these search parameters!");
+        }
 
         return await this.article.find({
             where: { articleId: In(articleIds) },
